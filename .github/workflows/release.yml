@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version number for this release (e.g., 1.0.0)"
+        description: 'Version tag (e.g., 0.0.8)'
         required: true
-        type: string
 
 permissions:
   contents: write
@@ -14,24 +13,19 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create Git tag
+      - name: Create Tag
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ github.event.inputs.version }}" -m "Release ${{ github.event.inputs.version }}"
-
-      - name: Push tag
-        run: git push origin "${{ github.event.inputs.version }}"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag ${{ github.event.inputs.version }}
+          git push origin ${{ github.event.inputs.version }}
 
       - name: Package and Release
         uses: BigWigsMods/packager@v2
-        with:
-          args: -g retail
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
