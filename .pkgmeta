@@ -1,0 +1,5 @@
+package-as: BetterTooltips
+
+ignore:
+  - .github
+  - README.md
