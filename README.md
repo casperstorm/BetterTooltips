@@ -2,6 +2,8 @@
 
 A World of Warcraft addon that lets you customize the default tooltip.
 
+<img src="icon.png" alt="icon" width="128"> 
+
 ![BetterTooltips](asset.png)
 
 ## Features
