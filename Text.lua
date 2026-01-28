@@ -1,7 +1,8 @@
 local _, Addon = ...
 
 local function ApplyText()
-    local opacity = BetterTooltipsDB.textOpacity
+    local _, unit = GameTooltip:GetUnit()
+    local opacity = unit and BetterTooltipsDB.textOpacity or 1.0
 
     for i = 1, GameTooltip:NumLines() do
         local leftText = _G["GameTooltipTextLeft" .. i]

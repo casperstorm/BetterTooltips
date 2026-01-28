@@ -16,7 +16,9 @@ local function ApplyBorder()
         return
     end
 
-    local opacity = BetterTooltipsDB.borderOpacity
+    local _, unit = GameTooltip:GetUnit()
+    local opacity = unit and BetterTooltipsDB.borderOpacity or 1.0
+
     for _, pieceName in ipairs(borderPieces) do
         local piece = GameTooltip.NineSlice[pieceName]
         if piece then

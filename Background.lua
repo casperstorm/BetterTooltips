@@ -5,7 +5,10 @@ local function ApplyBackground()
         return
     end
 
-    GameTooltip.NineSlice.Center:SetAlpha(BetterTooltipsDB.backgroundOpacity)
+    local _, unit = GameTooltip:GetUnit()
+    local opacity = unit and BetterTooltipsDB.backgroundOpacity or 1.0
+
+    GameTooltip.NineSlice.Center:SetAlpha(opacity)
 end
 
 function Addon:RefreshBackground()
