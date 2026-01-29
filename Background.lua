@@ -1,14 +1,29 @@
 local _, Addon = ...
 
-local function ApplyBackground()
-    if not GameTooltip.NineSlice or not GameTooltip.NineSlice.Center then
+local isMainTooltipStyled = false
+
+local function ShouldStyle()
+    local anchor = GameTooltip:GetAnchorType()
+    return anchor == "ANCHOR_NONE"
+end
+
+local function ApplyBackgroundToTooltip(tooltip, opacity)
+    if not tooltip.NineSlice or not tooltip.NineSlice.Center then
         return
     end
 
-    local _, unit = GameTooltip:GetUnit()
-    local opacity = unit and BetterTooltipsDB.backgroundOpacity or 1.0
+    tooltip.NineSlice.Center:SetAlpha(opacity)
+end
 
-    GameTooltip.NineSlice.Center:SetAlpha(opacity)
+local function ApplyBackground()
+    isMainTooltipStyled = ShouldStyle()
+    local opacity = isMainTooltipStyled and BetterTooltipsDB.backgroundOpacity or 1.0
+    ApplyBackgroundToTooltip(GameTooltip, opacity)
+end
+
+local function ApplyShoppingBackground(tooltip)
+    local opacity = isMainTooltipStyled and BetterTooltipsDB.backgroundOpacity or 1.0
+    ApplyBackgroundToTooltip(tooltip, opacity)
 end
 
 function Addon:RefreshBackground()
@@ -17,4 +32,6 @@ end
 
 function Addon:HookBackground()
     hooksecurefunc(GameTooltip, "Show", ApplyBackground)
+    hooksecurefunc(ShoppingTooltip1, "Show", function() ApplyShoppingBackground(ShoppingTooltip1) end)
+    hooksecurefunc(ShoppingTooltip2, "Show", function() ApplyShoppingBackground(ShoppingTooltip2) end)
 end

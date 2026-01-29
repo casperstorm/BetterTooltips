@@ -1,13 +1,19 @@
 local _, Addon = ...
 
+local function ShouldStyle()
+    local anchor = GameTooltip:GetAnchorType()
+    return anchor == "ANCHOR_NONE"
+end
+
 local function ApplyHealthBar()
     local statusBar = GameTooltipStatusBar or (GameTooltip and GameTooltip.StatusBar)
 
     if statusBar then
-        if BetterTooltipsDB.hideHealthBar then
+        local shouldHide = ShouldStyle() and BetterTooltipsDB.hideHealthBar
+        if shouldHide then
             statusBar:Hide()
             statusBar:SetScript("OnShow", function(self)
-                if BetterTooltipsDB.hideHealthBar then
+                if ShouldStyle() and BetterTooltipsDB.hideHealthBar then
                     self:Hide()
                 end
             end)
@@ -26,7 +32,7 @@ function Addon:HookHealthBar()
     ApplyHealthBar()
 
     hooksecurefunc(GameTooltip, "Show", function()
-        if BetterTooltipsDB.hideHealthBar then
+        if ShouldStyle() and BetterTooltipsDB.hideHealthBar then
             local statusBar = GameTooltipStatusBar or (GameTooltip and GameTooltip.StatusBar)
             if statusBar then
                 statusBar:Hide()
