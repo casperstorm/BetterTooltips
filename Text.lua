@@ -94,13 +94,39 @@ local function BuildPlayerNameText(unit, hideServer, hideTitle)
     return nameText
 end
 
+local function GetTooltipUnitToken(tooltip)
+    if not tooltip or not tooltip.GetUnit then
+        return nil
+    end
+
+    local ok, _, unit = pcall(tooltip.GetUnit, tooltip)
+    if not ok then
+        return nil
+    end
+
+    if type(unit) ~= "string" then
+        return nil
+    end
+
+    return unit
+end
+
+local function IsPlayerUnit(unit)
+    if type(unit) ~= "string" then
+        return false
+    end
+
+    local ok, isPlayer = pcall(UnitIsPlayer, unit)
+    return ok and isPlayer
+end
+
 local function ApplyPlayerNameFormatting(tooltip, shouldFormatName)
     if not shouldFormatName then
         return
     end
 
-    local _, unit = tooltip:GetUnit()
-    if not unit or not UnitIsPlayer(unit) then
+    local unit = GetTooltipUnitToken(tooltip)
+    if not unit or not IsPlayerUnit(unit) then
         return
     end
 
@@ -127,8 +153,8 @@ local function ApplyPlayerNameClassColor(tooltip, shouldUseClassColor)
         return
     end
 
-    local _, unit = tooltip:GetUnit()
-    if not unit or not UnitIsPlayer(unit) then
+    local unit = GetTooltipUnitToken(tooltip)
+    if not unit or not IsPlayerUnit(unit) then
         return
     end
 
@@ -154,8 +180,8 @@ local function ApplyPlayerGuildColor(tooltip, shouldApplyGuildColor)
         return
     end
 
-    local _, unit = tooltip:GetUnit()
-    if not unit or not UnitIsPlayer(unit) then
+    local unit = GetTooltipUnitToken(tooltip)
+    if not unit or not IsPlayerUnit(unit) then
         return
     end
 
@@ -231,9 +257,9 @@ end
 
 function Addon:RefreshNameClassColor()
     ApplyText()
-    local _, unit = GameTooltip:GetUnit()
+    local unit = GetTooltipUnitToken(GameTooltip)
     if unit then
-        GameTooltip:SetUnit(unit)
+        pcall(GameTooltip.SetUnit, GameTooltip, unit)
     end
 end
 
