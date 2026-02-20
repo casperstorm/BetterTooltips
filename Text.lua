@@ -149,6 +149,66 @@ local function ApplyPlayerNameClassColor(tooltip, shouldUseClassColor)
     end
 end
 
+local function ApplyPlayerGuildColor(tooltip, shouldApplyGuildColor)
+    if not shouldApplyGuildColor then
+        return
+    end
+
+    local _, unit = tooltip:GetUnit()
+    if not unit or not UnitIsPlayer(unit) then
+        return
+    end
+
+    local guildColor = BetterTooltipsDB.guildNameColor
+    if type(guildColor) ~= "table" then
+        return
+    end
+
+    local tooltipName = tooltip:GetName()
+    local r = guildColor.r or 1
+    local g = guildColor.g or 1
+    local b = guildColor.b or 1
+    local guildName = GetGuildInfo(unit)
+
+    local function StripColorCodes(text)
+        if not text then
+            return nil
+        end
+        return text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+    end
+
+    local line2 = _G[tooltipName .. "TextLeft2"]
+    if line2 then
+        local line2Text = StripColorCodes(line2:GetText())
+        if line2Text and line2Text ~= "" then
+            if guildName and (line2Text == guildName or line2Text == "<" .. guildName .. ">") then
+                line2:SetTextColor(r, g, b)
+                return
+            end
+
+            local looksLikeFaction = line2Text == FACTION_HORDE or line2Text == FACTION_ALLIANCE
+            local looksLikeLevel = LEVEL and line2Text:find(LEVEL, 1, true) == 1
+            if not looksLikeFaction and not looksLikeLevel then
+                line2:SetTextColor(r, g, b)
+                return
+            end
+        end
+    end
+
+    for i = 2, tooltip:NumLines() do
+        local leftText = _G[tooltipName .. "TextLeft" .. i]
+        if leftText then
+            local plain = StripColorCodes(leftText:GetText())
+            if plain and plain ~= "" then
+                if guildName and (plain == guildName or plain == "<" .. guildName .. ">") then
+                    leftText:SetTextColor(r, g, b)
+                    return
+                end
+            end
+        end
+    end
+end
+
 local function ApplyText()
     isMainTooltipStyled = ShouldStyle()
     local opacity = isMainTooltipStyled and BetterTooltipsDB.textOpacity or 1.0
@@ -156,6 +216,8 @@ local function ApplyText()
     ApplyPlayerNameFormatting(GameTooltip, isMainTooltipStyled)
     local shouldUseClassColor = isMainTooltipStyled and BetterTooltipsDB.useClassColorNames
     ApplyPlayerNameClassColor(GameTooltip, shouldUseClassColor)
+    local shouldUseGuildColor = isMainTooltipStyled and BetterTooltipsDB.useGuildNameColor
+    ApplyPlayerGuildColor(GameTooltip, shouldUseGuildColor)
 end
 
 local function ApplyShoppingText(tooltip)

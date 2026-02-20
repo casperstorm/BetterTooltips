@@ -8,7 +8,17 @@ local defaults = {
     useClassColorNames = false,
     hidePlayerServer = false,
     hidePlayerTitle = false,
+    useGuildNameColor = false,
+    guildNameColor = { r = 0.0, g = 1.0, b = 0.6 },
 }
+
+local function CopyTableShallow(source)
+    local copy = {}
+    for key, value in pairs(source) do
+        copy[key] = value
+    end
+    return copy
+end
 
 local function InitializeDB()
     if not BetterTooltipsDB then
@@ -17,7 +27,13 @@ local function InitializeDB()
 
     for key, value in pairs(defaults) do
         if BetterTooltipsDB[key] == nil then
-            BetterTooltipsDB[key] = value
+            BetterTooltipsDB[key] = type(value) == "table" and CopyTableShallow(value) or value
+        elseif type(value) == "table" and type(BetterTooltipsDB[key]) == "table" then
+            for subKey, subValue in pairs(value) do
+                if BetterTooltipsDB[key][subKey] == nil then
+                    BetterTooltipsDB[key][subKey] = subValue
+                end
+            end
         end
     end
 end

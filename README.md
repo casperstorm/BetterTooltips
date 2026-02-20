@@ -15,6 +15,7 @@ A World of Warcraft addon that lets you customize the default tooltip.
 - Optional player name class colors
 - Optional hide server in player names
 - Optional hide title in player names
+- Optional configurable guild name color
 
 ## Usage
 

@@ -73,9 +73,54 @@ local function CreateSlider(parent, label, dbKey, minVal, maxVal, step, yOffset,
     return container
 end
 
+local function CreateColorSwatchButton(parent, dbKey, onChange)
+    local swatchButton = CreateFrame("Button", nil, parent, "BackdropTemplate")
+    swatchButton:SetSize(28, 18)
+    swatchButton:SetBackdrop({
+        bgFile = "Interface/Buttons/WHITE8X8",
+        edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+        edgeSize = 10,
+        insets = { left = 2, right = 2, top = 2, bottom = 2 },
+    })
+
+    local function SetColor(r, g, b)
+        BetterTooltipsDB[dbKey] = { r = r, g = g, b = b }
+        swatchButton:SetBackdropColor(r, g, b, 1)
+        if onChange then
+            onChange(r, g, b)
+        end
+    end
+
+    local initial = BetterTooltipsDB[dbKey] or { r = 1, g = 1, b = 1 }
+    swatchButton:SetBackdropColor(initial.r, initial.g, initial.b, 1)
+
+    swatchButton:SetScript("OnClick", function()
+        local current = BetterTooltipsDB[dbKey] or { r = 1, g = 1, b = 1 }
+        local info = {
+            r = current.r,
+            g = current.g,
+            b = current.b,
+            hasOpacity = false,
+            swatchFunc = function()
+                local r, g, b = ColorPickerFrame:GetColorRGB()
+                SetColor(r, g, b)
+            end,
+            cancelFunc = function(previousValues)
+                if previousValues then
+                    SetColor(previousValues.r, previousValues.g, previousValues.b)
+                end
+            end,
+        }
+
+        ColorPickerFrame:SetupColorPickerAndShow(info)
+    end)
+
+    return swatchButton
+end
+
 local function CreateConfigFrame()
     local frame = CreateFrame("Frame", "BetterTooltipsConfigFrame", UIParent, "BasicFrameTemplateWithInset")
-    frame:SetSize(400, 320)
+    frame:SetSize(400, 355)
     frame:SetPoint("CENTER")
     frame:SetMovable(true)
     frame:EnableMouse(true)
@@ -142,6 +187,17 @@ local function CreateConfigFrame()
         Addon:RefreshNameClassColor()
     end)
     hidePlayerTitleCheckbox:SetPoint("TOPLEFT", content, "TOPLEFT", 0, y)
+
+    y = y - 35
+
+    local useGuildNameColorCheckbox = CreateCheckbox(content, "Use Custom Guild Name Color", "useGuildNameColor", function()
+        Addon:RefreshNameClassColor()
+    end)
+    useGuildNameColorCheckbox:SetPoint("TOPLEFT", content, "TOPLEFT", 0, y)
+    local guildColorSwatch = CreateColorSwatchButton(content, "guildNameColor", function()
+        Addon:RefreshNameClassColor()
+    end)
+    guildColorSwatch:SetPoint("LEFT", useGuildNameColorCheckbox.Text, "RIGHT", 8, 1)
 
     return frame
 end
