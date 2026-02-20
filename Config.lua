@@ -75,7 +75,7 @@ end
 
 local function CreateConfigFrame()
     local frame = CreateFrame("Frame", "BetterTooltipsConfigFrame", UIParent, "BasicFrameTemplateWithInset")
-    frame:SetSize(400, 220)
+    frame:SetSize(400, 320)
     frame:SetPoint("CENTER")
     frame:SetMovable(true)
     frame:EnableMouse(true)
@@ -121,6 +121,27 @@ local function CreateConfigFrame()
     local textOpacitySlider = CreateSlider(content, "Text Opacity", "textOpacity", 0, 1, 0.1, y, function()
         Addon:RefreshText()
     end, true)
+
+    y = y - 35
+
+    local classColorNamesCheckbox = CreateCheckbox(content, "Use Class Colors for Names", "useClassColorNames", function()
+        Addon:RefreshNameClassColor()
+    end)
+    classColorNamesCheckbox:SetPoint("TOPLEFT", content, "TOPLEFT", 0, y)
+
+    y = y - 35
+
+    local hidePlayerServerCheckbox = CreateCheckbox(content, "Hide Server in Player Names", "hidePlayerServer", function()
+        Addon:RefreshNameClassColor()
+    end)
+    hidePlayerServerCheckbox:SetPoint("TOPLEFT", content, "TOPLEFT", 0, y)
+
+    y = y - 35
+
+    local hidePlayerTitleCheckbox = CreateCheckbox(content, "Hide Title in Player Names", "hidePlayerTitle", function()
+        Addon:RefreshNameClassColor()
+    end)
+    hidePlayerTitleCheckbox:SetPoint("TOPLEFT", content, "TOPLEFT", 0, y)
 
     return frame
 end

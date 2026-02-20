@@ -12,6 +12,9 @@ A World of Warcraft addon that lets you customize the default tooltip.
 - Border opacity
 - Background opacity
 - Text opacity
+- Optional player name class colors
+- Optional hide server in player names
+- Optional hide title in player names
 
 ## Usage
 

@@ -5,6 +5,9 @@ local defaults = {
     borderOpacity = 1.0,
     backgroundOpacity = 1.0,
     textOpacity = 1.0,
+    useClassColorNames = false,
+    hidePlayerServer = false,
+    hidePlayerTitle = false,
 }
 
 local function InitializeDB()
