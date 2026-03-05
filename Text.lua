@@ -7,6 +7,36 @@ local function ShouldStyle()
     return anchor == "ANCHOR_NONE"
 end
 
+local function IsSecretValue(value)
+    return type(issecretvalue) == "function" and issecretvalue(value)
+end
+
+local function GetSafeStringWidth(fontString)
+    if not fontString or not fontString:IsShown() then
+        return 0
+    end
+
+    local ok, width = pcall(fontString.GetStringWidth, fontString)
+    if not ok or type(width) ~= "number" or IsSecretValue(width) then
+        return 0
+    end
+
+    return width
+end
+
+local function GetSafeTooltipWidth(tooltip)
+    if not tooltip or not tooltip.GetWidth then
+        return 0
+    end
+
+    local ok, width = pcall(tooltip.GetWidth, tooltip)
+    if not ok or type(width) ~= "number" or IsSecretValue(width) then
+        return 0
+    end
+
+    return width
+end
+
 local function ApplyTextToTooltip(tooltip, opacity)
     for i = 1, tooltip:NumLines() do
         local leftText = _G[tooltip:GetName() .. "TextLeft" .. i]
@@ -32,16 +62,15 @@ local function RecalculateTooltipWidth(tooltip)
         local leftText = _G[tooltipName .. "TextLeft" .. i]
         local rightText = _G[tooltipName .. "TextRight" .. i]
 
-        local lineWidth = 0
-        if leftText and leftText:IsShown() then
-            lineWidth = lineWidth + leftText:GetStringWidth()
-        end
+        local leftWidth = GetSafeStringWidth(leftText)
+        local rightWidth = GetSafeStringWidth(rightText)
 
-        if rightText and rightText:IsShown() then
+        local lineWidth = leftWidth
+        if rightWidth > 0 then
             if lineWidth > 0 then
                 lineWidth = lineWidth + 8
             end
-            lineWidth = lineWidth + rightText:GetStringWidth()
+            lineWidth = lineWidth + rightWidth
         end
 
         if lineWidth > maxLineWidth then
@@ -53,11 +82,17 @@ local function RecalculateTooltipWidth(tooltip)
         return
     end
 
+    local targetWidth = maxLineWidth + 24
+    local currentWidth = GetSafeTooltipWidth(tooltip)
+    if currentWidth > targetWidth then
+        targetWidth = currentWidth
+    end
+
     if tooltip.SetMinimumWidth then
         tooltip:SetMinimumWidth(0)
     end
 
-    tooltip:SetWidth(maxLineWidth + 24)
+    tooltip:SetWidth(targetWidth)
 end
 
 local function StripServerSuffix(nameText)
@@ -105,6 +140,10 @@ local function GetTooltipUnitToken(tooltip)
     end
 
     if type(unit) ~= "string" then
+        return nil
+    end
+
+    if IsSecretValue(unit) then
         return nil
     end
 
@@ -236,6 +275,10 @@ local function ApplyPlayerGuildColor(tooltip, shouldApplyGuildColor)
 end
 
 local function ApplyText()
+    if GameTooltip.IsForbidden and GameTooltip:IsForbidden() then
+        return
+    end
+
     isMainTooltipStyled = ShouldStyle()
     local opacity = isMainTooltipStyled and BetterTooltipsDB.textOpacity or 1.0
     ApplyTextToTooltip(GameTooltip, opacity)
@@ -247,6 +290,10 @@ local function ApplyText()
 end
 
 local function ApplyShoppingText(tooltip)
+    if tooltip.IsForbidden and tooltip:IsForbidden() then
+        return
+    end
+
     local opacity = isMainTooltipStyled and BetterTooltipsDB.textOpacity or 1.0
     ApplyTextToTooltip(tooltip, opacity)
 end
