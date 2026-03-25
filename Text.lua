@@ -95,12 +95,15 @@ local function RecalculateTooltipWidth(tooltip)
     tooltip:SetWidth(targetWidth)
 end
 
+local gsub = string.gsub
+local find = string.find
+
 local function StripServerSuffix(nameText)
     if not nameText or nameText == "" then
         return nameText
     end
 
-    return nameText:gsub("%-[^%-%s]+$", "")
+    return gsub(nameText, "%-[^%-%s]+$", "")
 end
 
 local function BuildPlayerNameText(unit, hideServer, hideTitle)
@@ -239,7 +242,9 @@ local function ApplyPlayerGuildColor(tooltip, shouldApplyGuildColor)
         if not text then
             return nil
         end
-        return text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+
+        text = gsub(text, "|c%x%x%x%x%x%x%x%x", "")
+        return gsub(text, "|r", "")
     end
 
     local line2 = _G[tooltipName .. "TextLeft2"]
@@ -252,7 +257,7 @@ local function ApplyPlayerGuildColor(tooltip, shouldApplyGuildColor)
             end
 
             local looksLikeFaction = line2Text == FACTION_HORDE or line2Text == FACTION_ALLIANCE
-            local looksLikeLevel = LEVEL and line2Text:find(LEVEL, 1, true) == 1
+            local looksLikeLevel = LEVEL and find(line2Text, LEVEL, 1, true) == 1
             if not looksLikeFaction and not looksLikeLevel then
                 line2:SetTextColor(r, g, b)
                 return
