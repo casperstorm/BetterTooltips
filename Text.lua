@@ -103,6 +103,10 @@ local function StripServerSuffix(nameText)
         return nameText
     end
 
+    if IsSecretValue(nameText) then
+        return nameText
+    end
+
     return gsub(nameText, "%-[^%-%s]+$", "")
 end
 
@@ -240,6 +244,10 @@ local function ApplyPlayerGuildColor(tooltip, shouldApplyGuildColor)
 
     local function StripColorCodes(text)
         if not text then
+            return nil
+        end
+
+        if IsSecretValue(text) then
             return nil
         end
 
